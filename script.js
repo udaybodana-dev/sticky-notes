@@ -110,6 +110,68 @@ function refresh () {
   }
 }
 
+function importNotes (event) {
+  const file = event.target.files[0]
+  if (!file) return
+  const reader = new FileReader()
+  reader.onload = function(e) {
+    try {
+      if (file.name.endsWith('.json')) {
+        const imported = JSON.parse(e.target.result)
+        if (Array.isArray(imported)) {
+          const isValid = imported.every(n => n.id && typeof n.text === 'string' && n.color)
+          if (isValid) {
+            myNotes = [...imported, ...myNotes]
+            save()
+            refresh()
+            alert('Success: All notes restored perfectly!')
+          } else {
+            alert('Invalid backup file format.')
+          }
+        } else {
+          alert('Invalid file format. File must contain an array of notes.')
+        }
+      } else {
+        const text = e.target.result
+        const n = {
+          id: Date.now(),
+          text: text,
+          color: 'yellow',
+          date: new Date().toLocaleDateString()
+        }
+        myNotes.push(n)
+        save()
+        refresh()
+        alert('Success: Note imported from text file!')
+      }
+    } catch (err) {
+      alert('Failed to parse file content.')
+    }
+  }
+  reader.readAsText(file)
+}
+
+function addBackupButtons () {
+  const btnGroup = document.querySelector('.action-buttons')
+  if (!btnGroup) return
+
+  const impBtn = document.createElement('button')
+  impBtn.innerText = 'Import'
+  impBtn.className = 'btn-clear'
+  impBtn.style.color = '#3b82f6'
+  impBtn.style.cursor = 'pointer'
+
+  const fileInput = document.createElement('input')
+  fileInput.type = 'file'
+  fileInput.accept = '.json,.txt'
+  fileInput.style.display = 'none'
+  fileInput.onchange = importNotes
+
+  impBtn.onclick = () => fileInput.click()
+
+  btnGroup.insertBefore(impBtn, btnGroup.firstChild)
+}
+
 clearBtn.onclick = () => {
   if (confirm('Delete every single note?')) {
     myNotes = []
@@ -122,6 +184,7 @@ addBtn.onclick = addBlank
 
 document.addEventListener('DOMContentLoaded', () => {
   createSearch()
+  addBackupButtons()
   if (myNotes.length === 0) {
     addBlank()
   } else {

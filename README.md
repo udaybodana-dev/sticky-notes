@@ -2,6 +2,8 @@
 
 A sleek, premium, and highly interactive digital canvas for sticky notes. Instantly create, customize colors, edit text, and delete notes dynamically on a modern note board.
 
+`Documentation Update (2026): Added live deployment link -`  https://udaybodana-dev.github.io/sticky-notes/
+
 ---
 
 ## ✨ Features
